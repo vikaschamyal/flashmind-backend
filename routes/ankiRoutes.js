@@ -5,6 +5,13 @@ const router = express.Router();
 const AnkiNote = require("../models/AnkiNote");
 const authMiddleware = require("../middleware/authMiddleware");
 
+//test routes
+
+router.get("/test", (req, res) => {
+  res.send("Anki route is working!");
+});
+
+
 // GET all notes for logged-in user
 router.get("/", authMiddleware, async (req, res) => {
   try {

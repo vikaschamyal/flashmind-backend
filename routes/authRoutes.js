@@ -5,8 +5,15 @@ const User = require("../models/User");
 
 const router = express.Router();
 
+// ✅ Test route
+router.get("/test", (req, res) => {
+  res.send("Auth route is working!");
+});
+
 // REGISTER
 router.post("/register", async (req, res) => {
+  console.log("🔐 Register request body:", req.body);
+
   const { email, password } = req.body;
   try {
     const existing = await User.findOne({ email });
@@ -19,8 +26,10 @@ router.post("/register", async (req, res) => {
 
     res.status(201).json({ message: "User created successfully" });
   } catch (err) {
+    console.error("❌ Register Error:", err); // Add this
     res.status(500).json({ message: "Server error" });
   }
+  
 });
 
 // LOGIN
