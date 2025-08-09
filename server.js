@@ -1,43 +1,50 @@
+// server.js
+
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const dotenv = require("dotenv");
 
-dotenv.config();
-
 const authRoutes = require("./routes/authRoutes");
 const ankiRoutes = require("./routes/ankiRoutes");
+const quizRoutes = require("./routes/quizRoutes");
+
+dotenv.config();
 
 const app = express();
 
-// ✅ Allow both local and deployed frontend origins
 const allowedOrigins = [
-  "http://localhost:5173",              // local dev
-  "https://flashmind-livid.vercel.app"       // deployed frontend on Vercel
+  "http://localhost:5173",
+  "https://flashmind-livid.vercel.app"
 ];
 
-app.use(cors({
-  origin: function (origin, callback) {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error("Not allowed by CORS"));
-    }
-  },
-  credentials: true // ✅ If using cookies or auth headers
-}));
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true,
+  })
+);
 
 app.use(express.json());
 
+// Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/anki", ankiRoutes);
+app.use("/api/quiz", quizRoutes);
 
-mongoose.connect(process.env.MONGO_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-}).then(() => {
-  console.log("✅ MongoDB Connected");
-  app.listen(process.env.PORT || 8000, () => {
-    console.log("🚀 Server running on port 8000");
-  });
-}).catch(err => console.error("❌ MongoDB connection error:", err));
+// DB connect
+mongoose
+  .connect(process.env.MONGO_URI)
+  .then(() => {
+    console.log("✅ MongoDB Connected");
+    app.listen(process.env.PORT || 8000, () => {
+      console.log(`🚀 Server running on port ${process.env.PORT || 8000}`);
+    });
+  })
+  .catch((err) => console.error("❌ MongoDB connection error:", err));
